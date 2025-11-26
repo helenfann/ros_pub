@@ -1,0 +1,18 @@
+Visualization Manager:
+  Displays:
+    - Class: rviz_default_plugins/Path
+      Name: Pose Path
+      Enabled: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /poses_path       # nav_msgs/Path (if available)
+      Line Style: Lines
+      Line Width: 0.03
+      Color: 25; 255; 0
+      Buffer Length: 10000       # retain many path updates
+      Pose Style: Axes           # triads per pose
+      Axes Length: 0.4
+      Axes Radius: 0.02
