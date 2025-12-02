@@ -20,6 +20,7 @@ setup(
         'console_scripts': [
             'pose_publisher = pose_pubsub.pose_publisher:main',
             'pose_subscriber = pose_pubsub.pose_subscriber:main',
+            'pose_to_path = pose_pubsub.pose_to_path:main',
         ],
     },
 )
