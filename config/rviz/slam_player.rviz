@@ -13,27 +13,15 @@ Visualization Manager:
       Line color: 128; 128; 0
     - Class: rviz_default_plugins/SetInitialPose
       Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
         Value: /initialpose
     - Class: rviz_default_plugins/SetGoal
       Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
         Value: /goal_pose
     - Class: rviz_default_plugins/PublishPoint
       Single click: true
       Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
         Value: /clicked_point
-        
+
   Displays:
     - Class: rviz_default_plugins/Grid
       Name: Grid
@@ -48,61 +36,55 @@ Visualization Manager:
         Value: Lines
         Line Width: 0.03
 
-    # Lines connecting EVERY pose (no pose axes)
+    # Trajectory 1
     - Class: rviz_default_plugins/Path
-      Name: Trajectory (lines)
+      Name: Trajectory A (lines)
       Enabled: true
-      Topic:
-        Value: /poses_path_full
+      Topic: { Value: /traj1/poses_path_full }
       Buffer Length: 10000
       Line Style: Lines
       Line Width: 0.03
       Color: 25; 255; 0
       Pose Style: None
 
-    # Axes only for every 5th pose; hide its line
     - Class: rviz_default_plugins/Path
-      Name: Pose Axes (stride)
+      Name: Pose Axes A (stride)
       Enabled: true
-      Topic:
-        Value: /poses_path_stride
+      Topic: { Value: /traj1/poses_path_stride }
       Buffer Length: 10000
       Line Style: Lines
       Line Width: 0.01
       Color: 0; 0; 0
-      Alpha: 0.0                 # hides the connecting line for stride path
+      Alpha: 0.0
       Pose Style: Axes
       Pose Color: 255; 85; 255
       Axes Length: 0.4
       Axes Radius: 0.02
 
-    # Optional: keep single pose if you want
-    - Class: rviz_default_plugins/Pose
-      Name: Pose (single)
-      Enabled: false
-      Shape: Axes
-      Axes Length: 0.5
-      Axes Radius: 0.03
-      Color: 255; 85; 255
-      Topic:
-        Value: /poses
+    # Trajectory 2
+    - Class: rviz_default_plugins/Path
+      Name: Trajectory B (lines)
+      Enabled: true
+      Topic: { Value: /traj2/poses_path_full }
+      Buffer Length: 10000
+      Line Style: Lines
+      Line Width: 0.03
+      Color: 255; 128; 0
+      Pose Style: None
 
-    # Latest pose with covariance (only if you publish PoseWithCovarianceStamped)
-    - Class: rviz_default_plugins/PoseWithCovariance
-      Name: Last Pose (cov)
-      Enabled: false
-      Shape: Axes
-      Axes Length: 1.0
-      Axes Radius: 0.2
-      Color: 255; 25; 0
-      Covariance:
-        Value: true
-      Topic:
-        Depth: 10
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Best Effort
-        Value: /slam_last_pose
+    - Class: rviz_default_plugins/Path
+      Name: Pose Axes B (stride)
+      Enabled: true
+      Topic: { Value: /traj2/poses_path_stride }
+      Buffer Length: 10000
+      Line Style: Lines
+      Line Width: 0.01
+      Color: 0; 0; 0
+      Alpha: 0.0
+      Pose Style: Axes
+      Pose Color: 85; 170; 255
+      Axes Length: 0.4
+      Axes Radius: 0.02
 
   Transformation:
     Current:

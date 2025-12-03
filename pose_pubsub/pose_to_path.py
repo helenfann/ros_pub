@@ -7,40 +7,42 @@ from nav_msgs.msg import Path
 class PoseToPath(Node):
     def __init__(self):
         super().__init__('pose_to_path')
-        self.declare_parameter('axis_stride', 30)
-        self.axis_stride = self.get_parameter('axis_stride').get_parameter_value().integer_value or 5
 
-        # Use Reliable to match RViz subscribers
+        self.declare_parameter('pose_topic', 'poses')
+        self.declare_parameter('axis_stride', 20)
+        self.declare_parameter('frame_id', 'map')
+
+        self.axis_stride = int(self.get_parameter('axis_stride').value)
+        self.frame_id = str(self.get_parameter('frame_id').value)
+        pose_topic = str(self.get_parameter('pose_topic').value)
+
         qos = QoSProfile(reliability=ReliabilityPolicy.RELIABLE,
                          history=HistoryPolicy.KEEP_LAST, depth=10)
 
-        self.full_path = Path(); self.full_path.header.frame_id = 'map'
-        self.stride_path = Path(); self.stride_path.header.frame_id = 'map'
-        self.pose_array = PoseArray(); self.pose_array.header.frame_id = 'map'  # optional, if you still want it
+        self.full_path = Path(); self.full_path.header.frame_id = self.frame_id
+        self.stride_path = Path(); self.stride_path.header.frame_id = self.frame_id
+        self.pose_array = PoseArray(); self.pose_array.header.frame_id = self.frame_id
         self.count = 0
 
-        self.sub = self.create_subscription(PoseStamped, '/poses', self.cb, qos)
-        self.pub_full = self.create_publisher(Path, '/poses_path_full', qos)
-        self.pub_stride = self.create_publisher(Path, '/poses_path_stride', qos)
-        self.pub_array = self.create_publisher(PoseArray, '/poses_stride_array', qos)
+        # relative topics so namespace isolates each instance
+        self.sub = self.create_subscription(PoseStamped, pose_topic, self.cb, qos)
+        self.pub_full = self.create_publisher(Path, 'poses_path_full', qos)
+        self.pub_stride = self.create_publisher(Path, 'poses_path_stride', qos)
+        self.pub_array = self.create_publisher(PoseArray, 'poses_stride_array', qos)
 
     def cb(self, msg: PoseStamped):
-        # keep frames consistent
-        if msg.header.frame_id != self.full_path.header.frame_id:
-            msg.header.frame_id = self.full_path.header.frame_id
+        if msg.header.frame_id != self.frame_id:
+            msg.header.frame_id = self.frame_id
 
-        # all poses for trajectory lines
         self.full_path.header.stamp = msg.header.stamp
         self.full_path.poses.append(msg)
         self.pub_full.publish(self.full_path)
 
-        # every Nth pose for axes-only visualisation (publish Path)
         if self.count % self.axis_stride == 0:
             self.stride_path.header.stamp = msg.header.stamp
             self.stride_path.poses.append(msg)
             self.pub_stride.publish(self.stride_path)
 
-            # optional PoseArray publish if you still use it elsewhere
             p = Pose()
             p.position = msg.pose.position
             p.orientation = msg.pose.orientation
