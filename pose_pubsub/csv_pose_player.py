@@ -4,6 +4,10 @@
 #   -p file_path:=/home/helen/ros2_ws/src/pose_pubsub/data/all_gt_poses_aria_new.csv \
 #   -p pose_topic:=poses -p frame_id:=map -p loop:=False
 
+# Handles both CSV formats:
+# 1. No spaces: counter,sec,nsec,x,y,z,qx,qy,qz,qw
+# 2. With spaces: counter, sec, nsec, x, y, z, qx, qy, qz, qw
+
 import csv
 import math
 import time
@@ -28,7 +32,6 @@ class CsvPosePlayer(Node):
         self.declare_parameter('pose_topic', 'poses')
         self.declare_parameter('frame_id', 'map')
         self.declare_parameter('loop', False)
-        # NEW: fixed startup delay in wall time
         self.declare_parameter('start_delay_sec', 0.0)
 
         self.file_path = self.get_parameter('file_path').value
@@ -72,14 +75,24 @@ class CsvPosePlayer(Node):
             if not first:
                 return rows
             if first.strip().startswith('#'):
+                # Header line starts with '#'; extract column names
                 header = [h.strip() for h in first.lstrip('#').split(',')]
                 reader = csv.DictReader(f, fieldnames=header, skipinitialspace=True)
             else:
+                # No '#' marker; rewind and let DictReader infer header
                 f.seek(0)
                 reader = csv.DictReader(f, skipinitialspace=True)
-            for row in reader:
+
+            for idx, row in enumerate(reader):
+                # Normalize keys (strip whitespace) and values (strip whitespace)
                 norm = {(k.strip() if k else ''): (row[k].strip() if isinstance(row[k], str) else row[k])
                         for k in row.keys()}
+                
+                # DEBUG: print raw parsed row (first row only)
+                if idx == 0:
+                    self.get_logger().info(f'DEBUG: raw row keys = {list(row.keys())}')
+                    self.get_logger().info(f'DEBUG: norm keys = {list(norm.keys())}')
+                
                 try:
                     rec = {
                         'counter': int(norm.get('counter', norm.get('# counter', '0'))),
@@ -89,16 +102,27 @@ class CsvPosePlayer(Node):
                         'y': float(norm.get('y', '0')),
                         'z': float(norm.get('z', '0')),
                     }
+                    
+                    # DEBUG: check if quat fields exist (first row only)
+                    if idx == 0:
+                        self.get_logger().info(f'DEBUG: checking quat: qx={norm.get("qx")}, qy={norm.get("qy")}, qz={norm.get("qz")}, qw={norm.get("qw")}')
+                    
                     if all(k in norm and norm[k] != '' for k in ('qx', 'qy', 'qz', 'qw')):
                         rec['qx'] = float(norm['qx']); rec['qy'] = float(norm['qy'])
                         rec['qz'] = float(norm['qz']); rec['qw'] = float(norm['qw'])
+                        if idx == 0:
+                            self.get_logger().info(f'DEBUG: parsed quat from CSV: qx={rec["qx"]:.6f}, qy={rec["qy"]:.6f}, qz={rec["qz"]:.6f}, qw={rec["qw"]:.6f}')
                     else:
-                        # Optional yaw fallback
+                        if idx == 0:
+                            self.get_logger().info(f'DEBUG: quat fields missing or empty, using yaw fallback')
+                        # Fallback to yaw if quat not available
                         yaw = float(norm.get('yaw', norm.get('theta', '0')))
                         qx, qy, qz, qw = yaw_to_quat(yaw)
                         rec['qx'], rec['qy'], rec['qz'], rec['qw'] = qx, qy, qz, qw
                     rows.append(rec)
-                except Exception:
+                except Exception as e:
+                    if idx == 0:
+                        self.get_logger().error(f'DEBUG: parse error on first row: {e}')
                     continue
         return rows
 

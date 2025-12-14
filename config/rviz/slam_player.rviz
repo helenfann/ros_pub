@@ -1,42 +1,6 @@
 Visualization Manager:
-  Global Options:
-    Background Color: 48; 48; 48
-    Fixed Frame: map
-    Frame Rate: 30
-  Tools:
-    - Class: rviz_default_plugins/Interact
-      Hide Inactive Objects: true
-    - Class: rviz_default_plugins/MoveCamera
-    - Class: rviz_default_plugins/Select
-    - Class: rviz_default_plugins/FocusCamera
-    - Class: rviz_default_plugins/Measure
-      Line color: 128; 128; 0
-    - Class: rviz_default_plugins/SetInitialPose
-      Topic:
-        Value: /initialpose
-    - Class: rviz_default_plugins/SetGoal
-      Topic:
-        Value: /goal_pose
-    - Class: rviz_default_plugins/PublishPoint
-      Single click: true
-      Topic:
-        Value: /clicked_point
-
   Displays:
-    - Class: rviz_default_plugins/Grid
-      Name: Grid
-      Enabled: true
-      Alpha: 0.5
-      Plane: XY
-      Plane Cell Count: 50
-      Cell Size: 2
-      Reference Frame: map
-      Color: 160; 160; 164
-      Line Style:
-        Value: Lines
-        Line Width: 0.03
-
-    # Trajectory 1
+    # Trajectory 1 (green line)
     - Class: rviz_default_plugins/Path
       Name: Trajectory A (lines)
       Enabled: true
@@ -44,24 +8,12 @@ Visualization Manager:
       Buffer Length: 10000
       Line Style: Lines
       Line Width: 0.03
-      Color: 25; 255; 0
+      Color: 0; 255; 0
       Pose Style: None
 
-    - Class: rviz_default_plugins/Path
-      Name: Pose Axes A (stride)
-      Enabled: true
-      Topic: { Value: /traj1/poses_path_stride }
-      Buffer Length: 10000
-      Line Style: Lines
-      Line Width: 0.01
-      Color: 0; 0; 0
-      Alpha: 0.0
-      Pose Style: Axes
-      Pose Color: 255; 85; 255
-      Axes Length: 0.4
-      Axes Radius: 0.02
 
-    # Trajectory 2
+
+    # Trajectory 2 (blue line)
     - Class: rviz_default_plugins/Path
       Name: Trajectory B (lines)
       Enabled: true
@@ -69,32 +21,25 @@ Visualization Manager:
       Buffer Length: 10000
       Line Style: Lines
       Line Width: 0.03
-      Color: 255; 128; 0
+      Color: 0; 128; 255
       Pose Style: None
 
-    - Class: rviz_default_plugins/Path
+
+
+    # Axes every 10th (traj1)
+    - Class: rviz_default_plugins/PoseArray
+      Name: Pose Axes A (stride)
+      Enabled: true
+      Topic: { Value: /traj1/poses_stride_array }
+      Shape: Axes
+      Axes Length: 0.6
+      Axes Radius: 0.03
+
+    # Axes every 10th (traj2)
+    - Class: rviz_default_plugins/PoseArray
       Name: Pose Axes B (stride)
       Enabled: true
-      Topic: { Value: /traj2/poses_path_stride }
-      Buffer Length: 10000
-      Line Style: Lines
-      Line Width: 0.01
-      Color: 0; 0; 0
-      Alpha: 0.0
-      Pose Style: Axes
-      Pose Color: 85; 170; 255
-      Axes Length: 0.4
-      Axes Radius: 0.02
-
-  Transformation:
-    Current:
-      Class: rviz_default_plugins/TF
-
-Views:
-  Current:
-    Class: rviz_default_plugins/Orbit
-    Name: Current View
-    Target Frame: <Fixed Frame>
-    Distance: 25
-    Pitch: 1.0
-    Yaw: 2.7
+      Topic: { Value: /traj2/poses_stride_array }
+      Shape: Axes
+      Axes Length: 0.6
+      Axes Radius: 0.03

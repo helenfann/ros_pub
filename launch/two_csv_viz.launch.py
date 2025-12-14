@@ -2,6 +2,8 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from launch_ros.actions import Node
+
 
 def generate_launch_description():
     csv1 = LaunchConfiguration('csv1')
@@ -16,8 +18,8 @@ def generate_launch_description():
         DeclareLaunchArgument('csv1'),
         DeclareLaunchArgument('csv2'),
         DeclareLaunchArgument('stride', default_value='1'),
-        DeclareLaunchArgument('start_delay_traj1', default_value='0.0'),
-        DeclareLaunchArgument('start_delay_traj2', default_value='8.43'),
+        DeclareLaunchArgument('start_delay_traj1', default_value='7.9693'),
+        DeclareLaunchArgument('start_delay_traj2', default_value='0.0'),
 
         Node(
             package='pose_pubsub',
